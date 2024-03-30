@@ -4,27 +4,38 @@ t_log* logger;
 
 int iniciar_servidor(void)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
+	
 
 	int socket_servidor;
 
-	struct addrinfo hints, *servinfo, *p;
+	struct addrinfo hints, *server_info, *p;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+	getaddrinfo(NULL, PUERTO, &hints, &server_info);
 
 	// Creamos el socket de escucha del servidor
 
+socket_servidor = socket(server_info->ai_family,
+                    server_info->ai_socktype,
+                    server_info->ai_protocol);
+
+
+
 	// Asociamos el socket a un puerto
-
+	//bind() está recibiendo el puerto que debe ocupar a partir de los datos que le suministramos al getaddrinfo con anterioridad. En este caso estamos diciendo que obtenga información de red sobre una IP NULL[1], en el puerto 4444, arbitrario elegido para este ejemplo.
+bind(socket_servidor, server_info->ai_addr, server_info->ai_addrlen);
 	// Escuchamos las conexiones entrantes
+	// listen() recibe como segundo parámetro la cantidad de conexiones vivas que puede mantener. SOMAXCONN como indica el nombre, es la cantidad máxima que admite el sistema operativo.
+listen(socket_servidor, SOMAXCONN);
 
-	freeaddrinfo(servinfo);
+
+
+	freeaddrinfo(server_info);
+
 	log_trace(logger, "Listo para escuchar a mi cliente");
 
 	return socket_servidor;
@@ -33,10 +44,11 @@ int iniciar_servidor(void)
 int esperar_cliente(int socket_servidor)
 {
 	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
+	
 
 	// Aceptamos un nuevo cliente
-	int socket_cliente;
+
+	int socket_cliente = accept(socket_servidor, NULL, NULL);
 	log_info(logger, "Se conecto un cliente!");
 
 	return socket_cliente;
